@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: techstore-db
+    environment:
+      POSTGRES_DB: techstore
+      POSTGRES_USER: techstore
+      POSTGRES_PASSWORD: techstore123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U techstore -d techstore"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: techstore-api
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=techstore;Username=techstore;Password=techstore123"
+      ASPNETCORE_ENVIRONMENT: Development
+      AllowedOrigins__0: "http://localhost:8080"
+      AllowedOrigins__1: "http://127.0.0.1:8080"
+    ports:
+      - "5001:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: nginx:alpine
+    container_name: techstore-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ../frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

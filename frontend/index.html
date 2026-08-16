@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore Cloud - Cadastro de Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>TechStore Cloud</h1>
+            <p>Sistema de Cadastro de Produtos</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="alert-container"></div>
+
+        <div class="toolbar">
+            <h2>Produtos</h2>
+            <button class="btn btn-primary" onclick="abrirModalCriar()">+ Novo Produto</button>
+        </div>
+
+        <div id="content">
+            <div class="loading">Carregando produtos...</div>
+        </div>
+    </main>
+
+    <!-- Modal de Formulário -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h2 id="modal-title">Novo Produto</h2>
+            <form id="produto-form" onsubmit="salvarProduto(event)">
+                <input type="hidden" id="produto-id">
+
+                <div class="form-group">
+                    <label for="nome">Nome *</label>
+                    <input type="text" id="nome" required maxlength="200" placeholder="Nome do produto">
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" maxlength="2000" placeholder="Descrição do produto"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="preco">Preço (R$) *</label>
+                    <input type="number" id="preco" required min="0" step="0.01" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoria *</label>
+                    <select id="categoria" required>
+                        <option value="">Selecione...</option>
+                        <option value="Notebooks">Notebooks</option>
+                        <option value="Smartphones">Smartphones</option>
+                        <option value="Monitores">Monitores</option>
+                        <option value="Periféricos">Periféricos</option>
+                        <option value="Componentes">Componentes</option>
+                        <option value="Acessórios">Acessórios</option>
+                        <option value="Software">Software</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantidade">Quantidade em Estoque *</label>
+                    <input type="number" id="quantidade" required min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="imagemUrl">URL da Imagem (opcional)</label>
+                    <input type="url" id="imagemUrl" placeholder="https://...">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-salvar">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div class="modal-overlay" id="modal-excluir">
+        <div class="modal">
+            <h2>Confirmar Exclusão</h2>
+            <p>Tem certeza que deseja excluir o produto <strong id="nome-excluir"></strong>?</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Esta ação não pode ser desfeita.</p>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="fecharModalExcluir()">Cancelar</button>
+                <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
