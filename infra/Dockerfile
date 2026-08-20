@@ -11,9 +11,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 RUN adduser --disabled-password --gecos '' appuser
-USER appuser
 
 COPY --from=build /app/publish .
+RUN chown -R appuser:appuser /app
+
+USER appuser
 
 ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Production
