@@ -1,4 +1,4 @@
-const API_URL = window.API_URL || 'http://localhost:5001/api/produtos';
+const API_URL = window.API_URL || 'https://d37rkfntjs33w3.cloudfront.net/api/produtos';
 
 async function carregarProdutos() {
     const content = document.getElementById('content');

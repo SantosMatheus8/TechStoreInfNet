@@ -176,6 +176,19 @@ docker run -d -p 5000:5000 \
   techstore-api
 ```
 
+Em `ASPNETCORE_ENVIRONMENT=Production`, a API carrega `appsettings.Production.json` e passa a enviar logs para o CloudWatch (log group `/techstore/api`, criado pelo CloudFormation) usando a IAM Role já anexada à instância (`techstore-ec2-role` / `CloudWatchLogsFullAccess`) — nenhuma credencial precisa ser configurada manualmente.
+
+Como o container roda em rede bridge (não `--network host`), ele só consegue buscar as credenciais da Role via metadata service (IMDS) se o hop limit permitir o salto extra do Docker. Rode uma vez por instância:
+
+```bash
+aws ec2 modify-instance-metadata-options \
+  --instance-id <EC2_INSTANCE_ID> \
+  --http-put-response-hop-limit 2 \
+  --http-tokens optional
+```
+
+Sem esse ajuste, o SDK falha silenciosamente ao buscar credenciais e nenhum log chega ao CloudWatch (a API continua funcionando normalmente, só o sink do CloudWatch fica mudo).
+
 ### 3. Atualizar o frontend
 
 Edite `frontend/js/app.js` e altere `API_URL` para o IP/DNS do EC2:

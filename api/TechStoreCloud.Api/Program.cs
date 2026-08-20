@@ -1,3 +1,5 @@
+using AWS.Logger;
+using AWS.Logger.SeriLog;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using TechStoreCloud.Api.Data;
@@ -8,13 +10,25 @@ using TechStoreCloud.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
-Log.Logger = new LoggerConfiguration()
+var loggerConfiguration = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "TechStoreCloud.Api")
     .WriteTo.Console()
-    .WriteTo.File("logs/api-.log", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+    .WriteTo.File("logs/api-.log", rollingInterval: RollingInterval.Day);
+
+// CloudWatch Logs (habilitado apenas quando AWS:LogGroup estiver configurado, ex.: na EC2)
+var cloudWatchLogGroup = builder.Configuration["AWS:LogGroup"];
+if (!string.IsNullOrWhiteSpace(cloudWatchLogGroup))
+{
+    loggerConfiguration = loggerConfiguration.WriteTo.AWSSeriLog(new AWSLoggerConfig
+    {
+        LogGroup = cloudWatchLogGroup,
+        Region = builder.Configuration["AWS:Region"] ?? "us-east-2"
+    });
+}
+
+Log.Logger = loggerConfiguration.CreateLogger();
 
 builder.Host.UseSerilog();
 
